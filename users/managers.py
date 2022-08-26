@@ -14,7 +14,7 @@ class CustomUserManager(BaseUserManager):
         Создает и сохраняет пользователя с именем пользователя и паролем
         """
         if not username:
-            raise ValueError(_('Поле username должно быть заполнено'))
+            raise ValueError(_('The field username is required'))
         user = self.model(username=username, **extra_fields)
         user.password = make_password(password)
         user.save()
