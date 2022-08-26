@@ -20,7 +20,7 @@ class Blogs(models.Model):
                               db_index=True)
 
     class Meta:
-        ordering = ('created_at')
+        ordering = ('-created_at')
         indexes = [
             GinIndex(fields=['title']),
             models.Index(fields=['created_at'])
@@ -67,7 +67,7 @@ class Posts(models.Model):
         super(Posts, self).save(*args, **kwargs)
 
     class Meta:
-        ordering = ('created_at')
+        ordering = ('-created_at')
         indexes = [
             GinIndex(fields=['title']),
             models.Index(fields=['created_at'])
