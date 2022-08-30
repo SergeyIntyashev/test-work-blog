@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from users.managers import CustomUserManager
 
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
+class CustomUser(AbstractBaseUser):
     """
     Кастомная модель пользователя.
     Поле username уникальное и используется для аутентификации

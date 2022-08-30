@@ -11,16 +11,15 @@ class Blogs(models.Model):
     title = models.CharField(max_length=150, blank=False)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now_add=True, auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
     authors = models.ManyToManyField(settings.AUTH_USER_MODEL,
-                                     blank=True,
-                                     null=True)
+                                     blank=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
                               on_delete=models.CASCADE,
-                              db_index=True)
+                              related_name='blogs_owner')
 
     class Meta:
-        ordering = ('-created_at')
+        ordering = ('-created_at',)
         indexes = [
             GinIndex(fields=['title']),
             models.Index(fields=['created_at'])
@@ -54,7 +53,7 @@ class Posts(models.Model):
     likes = models.PositiveIntegerField(default=0)
     views = models.PositiveIntegerField(default=0)
     blog = models.ForeignKey(Blogs, on_delete=models.CASCADE)
-    tags = models.ManyToManyField(Tags, blank=True, null=True)
+    tags = models.ManyToManyField(Tags, blank=True)
 
     def save(self, *args, **kwargs):
         """
@@ -67,7 +66,7 @@ class Posts(models.Model):
         super(Posts, self).save(*args, **kwargs)
 
     class Meta:
-        ordering = ('-created_at')
+        ordering = ('-created_at',)
         indexes = [
             GinIndex(fields=['title']),
             models.Index(fields=['created_at'])
@@ -83,14 +82,14 @@ class Comments(models.Model):
     Модель комментариев для постов
     """
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
+                               null=True,
                                on_delete=models.SET_NULL)
     body = models.TextField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ('created_at')
-        order_with_respect_to = 'post'
+        ordering = ('created_at',)
 
     def __str__(self):
         return f"id: {self.id} author: {self.author.username} " \
