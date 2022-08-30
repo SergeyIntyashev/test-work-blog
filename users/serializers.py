@@ -84,7 +84,7 @@ class CreateCommonUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('id', 'username')
+        fields = ('id', 'username', 'password')
 
     def validate(self, attrs):
         """
