@@ -8,7 +8,7 @@ class IsAuthenticatedAndOwner(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return bool(request.user and request.user.is_authenticated
-                    and (obj.user == request.user))
+                    and (obj.owner == request.user))
 
 
 class IsAuthenticatedAndAuthor(BasePermission):
