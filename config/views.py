@@ -22,7 +22,7 @@ class BaseView(GenericAPIView):
             response = super().dispatch(request, *args, **kwargs)
         except Exception as e:
             logger.error(traceback.format_exc())
-            return self._response({'errorMessage': e.message}, status=400)
+            return self._response({f'errorMessage: {e}'}, status=400)
 
         if isinstance(response, (dict, list)):
             return self._response(response)
