@@ -10,8 +10,8 @@ class CustomUserAdmin(UserAdmin):
     Переопределение пользователя в Django Admin
     """
     model = CustomUser
-    list_display = ('username', 'is_admin', 'is_active',)
-    list_filter = ('username', 'is_admin', 'is_active',)
+    list_display = ('username', 'is_admin')
+    list_filter = ('username', 'is_admin')
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         (_('Permissions'), {
@@ -21,12 +21,12 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'password1', 'password2', 'is_admin',
-                       'is_active'),
+            'fields': ('username', 'password1', 'password2', 'is_admin'),
         }),
     )
     search_fields = ('username',)
     ordering = ('username',)
+    filter_horizontal = []
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
