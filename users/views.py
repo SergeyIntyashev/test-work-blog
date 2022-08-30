@@ -1,13 +1,13 @@
 from rest_framework import status
+from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
-from config.views import BaseView
 from users.serializers import LoginSerializer, LogoutSerializer, \
     CreateCommonUserSerializer
 
 
-class CreateCommonUser(BaseView):
+class CreateCommonUser(GenericAPIView):
     """
     Создания простого пользователя
     """
@@ -22,7 +22,7 @@ class CreateCommonUser(BaseView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class LoginAPIView(BaseView):
+class LoginAPIView(GenericAPIView):
     """
     Авторизация пользователя и получение JWT токена
     """
@@ -35,7 +35,7 @@ class LoginAPIView(BaseView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class LogoutAPIView(BaseView):
+class LogoutAPIView(GenericAPIView):
     """
     Logout пользователя и занесение токена в black list
     """
