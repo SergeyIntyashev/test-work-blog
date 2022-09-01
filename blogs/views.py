@@ -1,13 +1,14 @@
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, UpdateAPIView
+from rest_framework.generics import CreateAPIView, UpdateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from blogs.models import Blogs
 from blogs.serializers import CreateBlogSerializer, \
-    AddAuthorsToBlogSerializer, PublishPostSerializer, CreateCommentSerializer
+    AddAuthorsToBlogSerializer, PublishPostSerializer, CreateCommentSerializer, \
+    BlogSerializer
 from blogs.services import user_can_publish_post, check_and_get_post, \
     add_like_to_post
 from config.permissions import IsAuthenticatedAndOwner, IsAdminUser
@@ -26,7 +27,7 @@ class CreateBlog(CreateAPIView):
         serializer.save()
 
 
-class AddAuthorsToBlog(UpdateAPIView):
+class AddAuthorsToBlogView(UpdateAPIView):
     """
     Добавление авторов в блог, где пользователь является owner'ом
     """
@@ -39,7 +40,7 @@ class AddAuthorsToBlog(UpdateAPIView):
         return Blogs.objects.filter(owner=self.request.user)
 
 
-class PublishPost(CreateAPIView):
+class PublishPostView(CreateAPIView):
     """
     Публикация поста в блог
     """
@@ -67,7 +68,7 @@ class PublishPost(CreateAPIView):
         serializer.save()
 
 
-class CreateComment(CreateAPIView):
+class CreateCommentView(CreateAPIView):
     """
     Создание комментария для поста
     """
@@ -85,7 +86,7 @@ class CreateComment(CreateAPIView):
         serializer.save()
 
 
-class LikePost(APIView):
+class LikePostView(APIView):
     """
     Увеличение лайка у поста
     """
@@ -99,3 +100,9 @@ class LikePost(APIView):
         add_like_to_post(post)
 
         return Response(status=status.HTTP_200_OK)
+
+
+class ListBlogView(ListAPIView):
+    queryset = Blogs.objects.all()
+    serializer_class = BlogSerializer
+    permission_classes = [IsAuthenticated | IsAdminUser]
