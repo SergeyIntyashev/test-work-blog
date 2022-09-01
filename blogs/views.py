@@ -1,52 +1,49 @@
 from django.utils import timezone
-from rest_framework import status
-from rest_framework.generics import CreateAPIView, UpdateAPIView, ListAPIView
+from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from blogs.models import Blogs
-from blogs.serializers import CreateBlogSerializer, \
-    AddAuthorsToBlogSerializer, PublishPostSerializer, CreateCommentSerializer, \
-    BlogSerializer
+from blogs import serializers
 from blogs.services import user_can_publish_post, check_and_get_post, \
     add_like_to_post
 from config.permissions import IsAuthenticatedAndOwner, IsAdminUser
 
 
-class CreateBlog(CreateAPIView):
+class CreateBlog(generics.CreateAPIView):
     """
     Создание блога
     """
 
     permission_classes = [IsAuthenticated | IsAdminUser]
-    serializer_class = CreateBlogSerializer
+    serializer_class = serializers.CreateBlogSerializer
 
     def perform_create(self, serializer):
         serializer.validated_data['owner'] = self.request.user
         serializer.save()
 
 
-class AddAuthorsToBlogView(UpdateAPIView):
+class AddAuthorsToBlogView(generics.UpdateAPIView):
     """
     Добавление авторов в блог, где пользователь является owner'ом
     """
 
     permission_classes = [IsAuthenticatedAndOwner | IsAdminUser]
-    serializer_class = AddAuthorsToBlogSerializer
+    serializer_class = serializers.AddAuthorsToBlogSerializer
     http_method_names = ["patch"]
 
     def get_queryset(self):
         return Blogs.objects.filter(owner=self.request.user)
 
 
-class PublishPostView(CreateAPIView):
+class PublishPostView(generics.CreateAPIView):
     """
     Публикация поста в блог
     """
 
     permission_classes = [IsAuthenticated | IsAdminUser]
-    serializer_class = PublishPostSerializer
+    serializer_class = serializers.PublishPostSerializer
     lookup_field = 'blog_id'
 
     def perform_create(self, serializer):
@@ -68,12 +65,12 @@ class PublishPostView(CreateAPIView):
         serializer.save()
 
 
-class CreateCommentView(CreateAPIView):
+class CreateCommentView(generics.CreateAPIView):
     """
     Создание комментария для поста
     """
     permission_classes = [IsAuthenticated | IsAdminUser]
-    serializer_class = CreateCommentSerializer
+    serializer_class = serializers.CreateCommentSerializer
 
     def perform_create(self, serializer):
         post = check_and_get_post(post_id=self.kwargs['post_id'],
@@ -102,7 +99,7 @@ class LikePostView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class ListBlogView(ListAPIView):
+class ListBlogView(generics.ListAPIView):
     queryset = Blogs.objects.all()
-    serializer_class = BlogSerializer
+    serializer_class = serializers.BlogSerializer
     permission_classes = [IsAuthenticated | IsAdminUser]
