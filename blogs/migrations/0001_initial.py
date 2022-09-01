@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=150)),
                 ('body', models.TextField()),
                 ('is_published', models.BooleanField(default=False)),
-                ('created_at', models.DateTimeField(blank=True, editable=False)),
+                ('created_at', models.DateTimeField(blank=True, null=True, editable=False)),
                 ('likes', models.PositiveIntegerField(default=0)),
                 ('views', models.PositiveIntegerField(default=0)),
             ],
