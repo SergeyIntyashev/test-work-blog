@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
-from django.utils import timezone
 
 
 class Blogs(models.Model):
@@ -49,21 +48,11 @@ class Posts(models.Model):
     title = models.CharField(max_length=150, blank=False)
     body = models.TextField(blank=False)
     is_published = models.BooleanField(default=False)
-    created_at = models.DateTimeField(editable=False, blank=True)
+    created_at = models.DateTimeField(editable=False, blank=True, null=True)
     likes = models.PositiveIntegerField(default=0)
     views = models.PositiveIntegerField(default=0)
     blog = models.ForeignKey(Blogs, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tags, blank=True)
-
-    def save(self, *args, **kwargs):
-        """
-        Заполняет поле created_at, если оно пустое
-        и поле is_published = True
-        """
-        if self.is_published and not self.created_at:
-            self.created_at = timezone.now()
-
-        super(Posts, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ('-created_at',)
