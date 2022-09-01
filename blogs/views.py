@@ -69,6 +69,7 @@ class CreateCommentView(generics.CreateAPIView):
     """
     Создание комментария для поста
     """
+
     permission_classes = [IsAuthenticated | IsAdminUser]
     serializer_class = serializers.CreateCommentSerializer
 
@@ -100,6 +101,10 @@ class LikePostView(APIView):
 
 
 class ListBlogView(generics.ListAPIView):
+    """
+    Список всех блогов
+    """
+
     queryset = Blogs.objects.all()
     serializer_class = serializers.BlogSerializer
     permission_classes = [IsAuthenticated | IsAdminUser]
