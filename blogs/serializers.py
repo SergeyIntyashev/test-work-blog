@@ -1,16 +1,33 @@
 from rest_framework import serializers
+from rest_framework.relations import PrimaryKeyRelatedField
 
 from blogs.models import Blogs, Posts, Comments, Tags
+from users.models import CustomUser
 
 
-class CreateBlogSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     """
-    Сериализатор для создания блога
+    Сериализатор для информации о пользователе
     """
 
     class Meta:
+        model = CustomUser
+        fields = ['username']
+
+
+class BlogSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для блогов
+    """
+
+    owner = UserSerializer(read_only=True)
+    authors = UserSerializer(many=True, read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
+    updated_at = serializers.DateTimeField(read_only=True)
+
+    class Meta:
         model = Blogs
-        fields = ['title', 'description', 'owner', 'authors']
+        fields = '__all__'
 
 
 class AddAuthorsToBlogSerializer(serializers.ModelSerializer):
@@ -20,8 +37,12 @@ class AddAuthorsToBlogSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         authors = validated_data.pop('authors')
+        current_user = self.context['request'].user
+
         for author in authors:
-            instance.authors.add(author)
+            if author != current_user:
+                instance.authors.add(author)
+
         return instance
 
     class Meta:
@@ -29,45 +50,14 @@ class AddAuthorsToBlogSerializer(serializers.ModelSerializer):
         fields = ['authors']
 
 
-class PublishPostSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для публикации поста в блог
-    """
-
-    class Meta:
-        model = Posts
-        fields = ['title', 'body', 'is_published', 'blog', 'tags']
-
-
-class CreateCommentSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для создания комментариев
-    """
-
-    class Meta:
-        model = Comments
-        fields = ['body']
-
-
-class BlogSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для блогов
-    """
-
-    class Meta:
-        model = Blogs
-        fields = ['id', 'title', 'description', 'created_at', 'updated_at',
-                  'owner', 'authors']
-
-
-class TagSerializer(serializers.ModelSerializer):
+class TagSerializer(PrimaryKeyRelatedField, serializers.ModelSerializer):
     """
     Сериализатор для тэгов
     """
 
     class Meta:
         model = Tags
-        fields = ['id', 'title']
+        fields = '__all__'
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -75,18 +65,26 @@ class PostSerializer(serializers.ModelSerializer):
     Сериализатор для постов
     """
 
+    author = UserSerializer(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
+    likes = serializers.IntegerField(read_only=True)
+    views = serializers.IntegerField(read_only=True)
+    blog = BlogSerializer(read_only=True)
+    tags = TagSerializer(many=True, queryset=Tags.objects.all())
+
     class Meta:
         model = Posts
-        fields = ['id', 'author', 'title', 'body', 'is_published',
-                  'created_at',
-                  'likes', 'views', 'blog', 'tags']
+        fields = '__all__'
 
 
 class CommentSerializer(serializers.ModelSerializer):
     """
     Сериализатор для комментариев
     """
+    author = UserSerializer(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
+    post = PostSerializer(read_only=True)
 
     class Meta:
         model = Comments
-        fields = ['id', 'author', 'body', 'created_at', 'post']
+        fields = '__all__'
