@@ -16,8 +16,8 @@ urlpatterns = [
     path('subscribe/<int:pk>', views.SubscribeToBlogView.as_view(),
          name='subscribe-to-blog'),
 
-    path('<int:blog_id>/add-comment/<int:post_id>',
+    path('post/add-comment/<int:pk>',
          views.CreateCommentView.as_view(), name='create-comment-to-post'),
-    path('<int:blog_id>/add-like/<int:post_id>',
+    path('post/add-like/<int:pk>',
          views.LikePostView.as_view(), name='like-post'),
 ]
