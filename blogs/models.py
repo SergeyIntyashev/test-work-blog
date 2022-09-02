@@ -83,3 +83,13 @@ class Comments(models.Model):
     def __str__(self):
         return f"id: {self.id} author: {self.author.username} " \
                f"post: {self.post.id}"
+
+
+class Subscriptions(models.Model):
+    """
+    Модель подписок пользователей на блоги
+    """
+
+    blog = models.ForeignKey(Blogs, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
