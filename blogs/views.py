@@ -143,11 +143,9 @@ class LikePostView(APIView):
 
     permission_classes = [IsAuthenticated | IsAdminUser]
 
-    def get_queryset(self):
-        return Posts.objects.filter(id=self.kwargs[self.lookup_field])
-
-    def patch(self, request, *args, **kwargs):
-        post = self.get_object()
+    def post(self, request, *args, **kwargs):
+        post = generics.get_object_or_404(Posts,
+                                          id=self.kwargs['pk'])
         services.add_like_to_post(post)
 
         return Response(status=status.HTTP_200_OK)
