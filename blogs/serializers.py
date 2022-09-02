@@ -35,16 +35,6 @@ class AddAuthorsToBlogSerializer(serializers.ModelSerializer):
     Сериализатор для добавления авторов в блог
     """
 
-    def update(self, instance, validated_data):
-        authors = validated_data.pop('authors')
-        current_user = self.context['request'].user
-
-        for author in authors:
-            if author != current_user:
-                instance.authors.add(author)
-
-        return instance
-
     class Meta:
         model = Blogs
         fields = ['authors']
