@@ -4,10 +4,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from blogs import serializers
+from blogs import serializers, services
 from blogs.models import Blogs
-from blogs.services import check_and_get_post, \
-    add_like_to_post
 from config.permissions import IsAuthenticatedAndOwner, IsAdminUser, \
     IsAuthorOrBlogOwner
 
@@ -77,7 +75,41 @@ class AddAuthorsToBlogView(generics.UpdateAPIView):
 
     def get_queryset(self):
         return Blogs.objects.prefetch_related('authors').filter(
-            owner=self.request.user)
+            id=self.kwargs[self.lookup_field])
+
+    def perform_update(self, serializer):
+        blog = self.get_object()
+
+        serializer.validated_data['authors'] = \
+            services.get_added_authors_to_blog(
+                authors=self.kwargs['authors'],
+                current_user=self.request.user,
+                blog=blog)
+
+        serializer.save()
+
+
+class SubscribeToBlogView(generics.UpdateAPIView):
+    """
+    Подписка пользователя на блог
+    """
+    permission_classes = [IsAuthenticated | IsAdminUser]
+    serializer_class = serializers.AddAuthorsToBlogSerializer
+    http_method_names = ["patch"]
+
+    def get_queryset(self):
+        return Blogs.objects.prefetch_related('subscriptions').filter(
+            id=self.kwargs[self.lookup_field])
+
+    def perform_update(self, serializer):
+        blog = self.get_object()
+
+        serializer.validated_data['subscriptions'] = \
+            services.get_added_subscriptions_to_blog(
+                current_user=self.request.user,
+                blog=blog)
+
+        serializer.save()
 
 
 # POST VIEWS
@@ -114,8 +146,8 @@ class CreateCommentView(generics.CreateAPIView):
     serializer_class = serializers.CommentSerializer
 
     def perform_create(self, serializer):
-        post = check_and_get_post(post_id=self.kwargs['post_id'],
-                                  blog_id=self.kwargs['blog_id'])
+        post = services.check_and_get_post(post_id=self.kwargs['post_id'],
+                                           blog_id=self.kwargs['blog_id'])
 
         serializer.validated_data['author'] = self.request.user
         serializer.validated_data['post'] = post
@@ -131,8 +163,8 @@ class LikePostView(APIView):
     permission_classes = [IsAuthenticated | IsAdminUser]
 
     def patch(self, request, *args, **kwargs):
-        post = check_and_get_post(post_id=kwargs['post_id'],
-                                  blog_id=kwargs['blog_id'])
-        add_like_to_post(post)
+        post = services.check_and_get_post(post_id=kwargs['post_id'],
+                                           blog_id=kwargs['blog_id'])
+        services.add_like_to_post(post)
 
         return Response(status=status.HTTP_200_OK)
