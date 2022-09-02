@@ -12,10 +12,14 @@ class Blogs(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     authors = models.ManyToManyField(settings.AUTH_USER_MODEL,
-                                     blank=True)
+                                     blank=True,
+                                     related_name='authors')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
                               on_delete=models.CASCADE,
                               related_name='blogs_owner')
+    subscriptions = models.ManyToManyField(settings.AUTH_USER_MODEL,
+                                           blank=True,
+                                           related_name='subscriptions')
 
     class Meta:
         ordering = ('-updated_at',)
@@ -83,13 +87,3 @@ class Comments(models.Model):
     def __str__(self):
         return f"id: {self.id} author: {self.author.username} " \
                f"post: {self.post.id}"
-
-
-class Subscriptions(models.Model):
-    """
-    Модель подписок пользователей на блоги
-    """
-
-    blog = models.ForeignKey(Blogs, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
