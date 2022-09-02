@@ -13,6 +13,8 @@ urlpatterns = [
          name='add-authors-to-blog'),
     path('publish-post/<int:pk>', views.PublishPostView.as_view(),
          name='publish-post-to-blog'),
+    path('subscribe/<int:pk>', views.SubscribeToBlogView.as_view(),
+         name='subscribe-to-blog'),
 
     path('<int:blog_id>/add-comment/<int:post_id>',
          views.CreateCommentView.as_view(), name='create-comment-to-post'),
