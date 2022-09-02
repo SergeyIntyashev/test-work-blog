@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('updated_at', models.DateTimeField(auto_now=True)),
             ],
             options={
-                'ordering': ('-created_at',),
+                'ordering': ('-updated_at',),
             },
         ),
         migrations.CreateModel(

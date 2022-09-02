@@ -18,7 +18,7 @@ class Blogs(models.Model):
                               related_name='blogs_owner')
 
     class Meta:
-        ordering = ('-created_at',)
+        ordering = ('-updated_at',)
         indexes = [
             GinIndex(fields=['title']),
             models.Index(fields=['created_at'])
