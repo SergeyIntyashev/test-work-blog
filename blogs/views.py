@@ -102,7 +102,7 @@ class PublishPostView(generics.CreateAPIView):
     serializer_class = serializers.PostSerializer
 
     def get_queryset(self):
-        return not Blogs.objects.filter(id=self.kwargs[self.lookup_field])
+        return Blogs.objects.filter(id=self.kwargs[self.lookup_field])
 
     def perform_create(self, serializer):
         blog = self.get_object()
