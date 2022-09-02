@@ -41,7 +41,8 @@ class AddAuthorsToBlogSerializer(serializers.ModelSerializer):
         current_user = self.context['request'].user
 
         for author in authors:
-            if (author != current_user) and (author not in instance.authors):
+            if (author != current_user) \
+                    and (author not in instance.authors.all()):
                 instance.authors.add(author)
 
         return instance
@@ -59,7 +60,7 @@ class AddSubscriptionsToBlogSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         current_user = self.context['request'].user
 
-        if current_user not in instance.subscriptions:
+        if current_user not in instance.subscriptions.all():
             instance.subscriptions.add(current_user)
 
         return instance
