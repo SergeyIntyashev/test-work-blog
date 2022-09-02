@@ -77,39 +77,18 @@ class AddAuthorsToBlogView(generics.UpdateAPIView):
         return Blogs.objects.prefetch_related('authors').filter(
             id=self.kwargs[self.lookup_field])
 
-    def perform_update(self, serializer):
-        blog = self.get_object()
-
-        serializer.validated_data['authors'] = \
-            services.get_added_authors_to_blog(
-                authors=self.kwargs['authors'],
-                current_user=self.request.user,
-                blog=blog)
-
-        serializer.save()
-
 
 class SubscribeToBlogView(generics.UpdateAPIView):
     """
     Подписка пользователя на блог
     """
     permission_classes = [IsAuthenticated | IsAdminUser]
-    serializer_class = serializers.AddAuthorsToBlogSerializer
+    serializer_class = serializers.AddSubscriptionsToBlogSerializer
     http_method_names = ["patch"]
 
     def get_queryset(self):
         return Blogs.objects.prefetch_related('subscriptions').filter(
             id=self.kwargs[self.lookup_field])
-
-    def perform_update(self, serializer):
-        blog = self.get_object()
-
-        serializer.validated_data['subscriptions'] = \
-            services.get_added_subscriptions_to_blog(
-                current_user=self.request.user,
-                blog=blog)
-
-        serializer.save()
 
 
 # POST VIEWS
