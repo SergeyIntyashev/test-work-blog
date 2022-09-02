@@ -22,6 +22,7 @@ class BlogSerializer(serializers.ModelSerializer):
 
     owner = UserSerializer(read_only=True)
     authors = UserSerializer(many=True, read_only=True)
+    subscriptions = UserSerializer(many=True, read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
 
@@ -35,9 +36,37 @@ class AddAuthorsToBlogSerializer(serializers.ModelSerializer):
     Сериализатор для добавления авторов в блог
     """
 
+    def update(self, instance, validated_data):
+        authors = validated_data.pop('authors')
+        current_user = self.context['request'].user
+
+        for author in authors:
+            if (author != current_user) and (author not in instance.authors):
+                instance.authors.add(author)
+
+        return instance
+
     class Meta:
         model = Blogs
         fields = ['authors']
+
+
+class AddSubscriptionsToBlogSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для добавления подписчиков в блог
+    """
+
+    def update(self, instance, validated_data):
+        current_user = self.context['request'].user
+
+        if current_user not in instance.subscriptions:
+            instance.subscriptions.add(current_user)
+
+        return instance
+
+    class Meta:
+        model = Blogs
+        fields = ['subscriptions']
 
 
 class TagSerializer(PrimaryKeyRelatedField, serializers.ModelSerializer):
