@@ -3,14 +3,19 @@ from django.urls import path
 from blogs import views
 
 urlpatterns = [
-    path('', views.CreateBlog.as_view(), name='create-blog'),
-    path('<int:pk>/add-authors', views.AddAuthorsToBlogView.as_view(),
+    path('', views.ListBlogView.as_view(), name='list-of-blogs'),
+    path('<int:pk>', views.RetrieveBlogView.as_view(), name='blog-details'),
+    path('me/create', views.CreateBlogView.as_view(), name='create-blog'),
+    path('me/update/<int:pk>', views.UpdateBlogView.as_view(),
+         name='update-blog'),
+    path('me/<int:pk>', views.DestroyBlogView.as_view(), name='delete-blog'),
+    path('me/add-authors/<int:pk>', views.AddAuthorsToBlogView.as_view(),
          name='add-authors-to-blog'),
-    path('<int:blog_id>/publish-post/', views.PublishPostView.as_view(),
+    path('publish-post/<int:pk>', views.PublishPostView.as_view(),
          name='publish-post-to-blog'),
+
     path('<int:blog_id>/add-comment/<int:post_id>',
          views.CreateCommentView.as_view(), name='create-comment-to-post'),
     path('<int:blog_id>/add-like/<int:post_id>',
          views.LikePostView.as_view(), name='like-post'),
-    path('', views.ListBlogView.as_view(), name='list-of-blogs')
 ]
