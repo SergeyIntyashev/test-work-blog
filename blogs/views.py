@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from blogs import serializers, services
-from blogs.models import Blogs
+from blogs.models import Blogs, Posts
 from config.permissions import IsAuthenticatedAndOwner, IsAdminUser, \
     IsAuthorOrBlogOwner
 
@@ -124,9 +124,11 @@ class CreateCommentView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated | IsAdminUser]
     serializer_class = serializers.CommentSerializer
 
+    def get_queryset(self):
+        return Posts.objects.filter(id=self.kwargs[self.lookup_field])
+
     def perform_create(self, serializer):
-        post = services.check_and_get_post(post_id=self.kwargs['post_id'],
-                                           blog_id=self.kwargs['blog_id'])
+        post = self.get_object()
 
         serializer.validated_data['author'] = self.request.user
         serializer.validated_data['post'] = post
@@ -141,9 +143,11 @@ class LikePostView(APIView):
 
     permission_classes = [IsAuthenticated | IsAdminUser]
 
+    def get_queryset(self):
+        return Posts.objects.filter(id=self.kwargs[self.lookup_field])
+
     def patch(self, request, *args, **kwargs):
-        post = services.check_and_get_post(post_id=kwargs['post_id'],
-                                           blog_id=kwargs['blog_id'])
+        post = self.get_object()
         services.add_like_to_post(post)
 
         return Response(status=status.HTTP_200_OK)
