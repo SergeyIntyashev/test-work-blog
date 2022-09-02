@@ -1,5 +1,7 @@
 from rest_framework.permissions import BasePermission
 
+from blogs.models import Posts
+
 
 class IsAuthenticatedAndOwner(BasePermission):
     """
@@ -32,9 +34,13 @@ class IsAdminUser(BasePermission):
 
 class IsAuthorOrBlogOwner(BasePermission):
     """
-    Разрешает доступ автору или владельцу блога, которому принадлежит пост
+    Разрешает доступ автору или владельцу блога
     """
 
     def has_object_permission(self, request, view, obj):
-        return bool((request.user in obj.blog.authors.all())
-                    or (obj.blog.owner == request.user))
+
+        if isinstance(obj, Posts):
+            obj = obj.blog
+
+        return bool((request.user in obj.authors.all())
+                    or (obj.owner == request.user))
