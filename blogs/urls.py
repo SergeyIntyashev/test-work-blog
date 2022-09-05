@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework.routers import SimpleRouter
 
 from blogs import views
 
@@ -36,3 +37,9 @@ urlpatterns = [
     path('post/add-like/<int:pk>',
          views.LikePostView.as_view(), name='like-post'),
 ]
+
+router = SimpleRouter()
+router.register(r'comment', views.CommentView, basename='Comment')
+router.register(r'tag', views.TagsView, basename='Tag')
+
+urlpatterns += router.urls
