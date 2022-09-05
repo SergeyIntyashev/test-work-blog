@@ -4,11 +4,12 @@ from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
 from blogs import serializers, services
-from blogs.models import Blogs, Posts
+from blogs.models import Blogs, Posts, Comments, Tags
 from config.permissions import IsAuthenticatedAndOwner, IsAdminUser, \
-    IsAuthorOrBlogOwner
+    IsAuthorOrBlogOwner, IsAdminOrReadOnly
 
 
 # BLOG VIEWS
@@ -230,3 +231,27 @@ class CreateCommentView(generics.CreateAPIView):
         serializer.validated_data['post'] = post
 
         serializer.save()
+
+
+class CommentView(ModelViewSet):
+    """
+    View для комментариев
+    CRUD для администратора
+    Read-only для всех
+    """
+    queryset = Comments.objects.all()
+    permission_classes = [IsAdminOrReadOnly]
+    serializer_class = serializers.CommentSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('post',)
+
+
+class TagsView(ModelViewSet):
+    """
+    View для тэгов
+    CRUD для администратора
+    Read-only для всех
+    """
+    queryset = Tags.objects.all()
+    permission_classes = [IsAdminOrReadOnly]
+    serializer_class = serializers.TagSerializer
