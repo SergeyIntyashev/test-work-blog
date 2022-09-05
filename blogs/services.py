@@ -2,7 +2,6 @@ from django.db.models import F
 from django_filters import rest_framework as filters
 
 from blogs.models import Posts
-from users.models import CustomUser
 
 
 def increase_likes_of_post(post: Posts) -> None:
@@ -14,7 +13,7 @@ def increase_likes_of_post(post: Posts) -> None:
     post.save(update_fields=('likes',))
 
 
-def increase_views_of_post(post: Posts, user: CustomUser) -> None:
+def increase_views_of_post(post: Posts, user) -> None:
     """
     Инкрементирует просмотры поста,
     в случае, если пользователь не является владельцем блога
