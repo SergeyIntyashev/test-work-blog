@@ -15,6 +15,8 @@ urlpatterns = [
          name='publish-post-to-blog'),
     path('subscribe/<int:pk>', views.SubscribeToBlogView.as_view(),
          name='subscribe-to-blog'),
+    path('favorites', views.FavoriteBlogsView.as_view(),
+         name='my-favorite-blogs'),
 
     path('post/add-comment/<int:pk>',
          views.CreateCommentView.as_view(), name='create-comment-to-post'),
