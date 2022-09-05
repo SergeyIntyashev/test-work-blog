@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 from blogs.models import Posts
 
@@ -38,9 +38,18 @@ class IsAuthorOrBlogOwner(BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-
         if isinstance(obj, Posts):
             obj = obj.blog
 
         return bool((request.user in obj.authors.all())
                     or (obj.owner == request.user))
+
+
+class IsAdminOrReadOnly(BasePermission):
+    """
+    Доступ на чтение или для администратора
+    """
+
+    def has_permission(self, request, view):
+        return bool((request.method in SAFE_METHODS) or
+                    (request.user and request.user.is_admin))
