@@ -4,7 +4,7 @@ from django.core import exceptions
 from django.db import IntegrityError, transaction
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.settings import api_settings
+from rest_framework.settings import api_settings as settings
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -61,7 +61,7 @@ class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
 
     default_error_message = {
-        'bad_token': ('Token is expired or invalid')
+        'bad_token': ('Token is expired or invalid',)
     }
 
     def validate(self, attrs):
@@ -97,7 +97,9 @@ class CreateCommonUserSerializer(serializers.ModelSerializer):
         except exceptions.ValidationError as e:
             serializer_error = serializers.as_serializer_error(e)
             raise serializers.ValidationError(
-                {"password": serializer_error[api_settings.NON_FIELD_ERRORS_KEY]}
+                {
+                    "password": serializer_error[settings.NON_FIELD_ERRORS_KEY]
+                }
             )
         return attrs
 

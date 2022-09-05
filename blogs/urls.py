@@ -18,7 +18,6 @@ urlpatterns = [
     path('favorites', views.ListFavoriteBlogsView.as_view(),
          name='my-favorite-blogs'),
 
-
     path('posts/<int:pk>', views.ListPostsOfBlogView.as_view(),
          name='posts-of-blog'),
     path('posts', views.ListPostsView.as_view(), name='list-of-posts'),

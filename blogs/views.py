@@ -22,7 +22,9 @@ class ListBlogView(generics.ListAPIView):
     serializer_class = serializers.BlogSerializer
     permission_classes = [AllowAny]
     filter_backends = (
-        DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter
     )
     filter_fields = ['created_at']
     search_fields = ['@title', '@authors__username']
@@ -97,7 +99,9 @@ class ListFavoriteBlogsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.BlogSerializer
     filter_backends = (
-        DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter
     )
     filter_fields = ['created_at']
     search_fields = ['@title', '@authors__username']
@@ -116,7 +120,9 @@ class ListUserPostsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.PostSerializer
     filter_backends = (
-        DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter
     )
     filterset_class = services.PostFilter
     search_fields = ['@title', '@author__username']
@@ -135,7 +141,9 @@ class ListPostsView(generics.ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = serializers.PostSerializer
     filter_backends = (
-        DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter
     )
     filterset_class = services.PostFilter
     search_fields = ['@title', '@author__username']
@@ -150,7 +158,9 @@ class ListPostsOfBlogView(generics.ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = serializers.PostSerializer
     filter_backends = (
-        DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter
     )
     filterset_class = services.PostFilter
     search_fields = ['@title', '@author__username']
@@ -226,8 +236,7 @@ class LikePostView(APIView):
     permission_classes = [IsAuthenticated | IsAdminUser]
 
     def post(self, request, *args, **kwargs):
-        post = generics.get_object_or_404(Posts,
-                                          id=self.kwargs['pk'])
+        post = generics.get_object_or_404(Posts, id=self.kwargs['pk'])
         services.increase_likes_of_post(post)
 
         return Response(status=status.HTTP_200_OK)

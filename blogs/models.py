@@ -11,15 +11,21 @@ class Blogs(models.Model):
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    authors = models.ManyToManyField(settings.AUTH_USER_MODEL,
-                                     blank=True,
-                                     related_name='authors')
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
-                              on_delete=models.CASCADE,
-                              related_name='blogs_owner')
-    subscriptions = models.ManyToManyField(settings.AUTH_USER_MODEL,
-                                           blank=True,
-                                           related_name='subscriptions')
+    authors = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        related_name='authors'
+    )
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='blogs_owner'
+    )
+    subscriptions = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        related_name='subscriptions'
+    )
 
     class Meta:
         ordering = ('-updated_at',)
@@ -46,9 +52,11 @@ class Posts(models.Model):
     """
     Модель постов
     """
-    author = models.ForeignKey(settings.AUTH_USER_MODEL,
-                               on_delete=models.CASCADE,
-                               db_index=True)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        db_index=True
+    )
     title = models.CharField(max_length=150, blank=False)
     body = models.TextField(blank=False)
     is_published = models.BooleanField(default=False)
@@ -74,9 +82,11 @@ class Comments(models.Model):
     """
     Модель комментариев для постов
     """
-    author = models.ForeignKey(settings.AUTH_USER_MODEL,
-                               null=True,
-                               on_delete=models.SET_NULL)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        on_delete=models.SET_NULL
+    )
     body = models.TextField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
