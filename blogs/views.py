@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -19,6 +20,8 @@ class ListBlogView(generics.ListAPIView):
     queryset = Blogs.objects.all()
     serializer_class = serializers.BlogSerializer
     permission_classes = [AllowAny]
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ['created_at']
 
 
 class CreateBlogView(generics.CreateAPIView):
@@ -97,6 +100,8 @@ class ListFavoriteBlogsView(generics.ListAPIView):
     """
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.BlogSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ['created_at']
 
     def get_queryset(self):
         return Blogs.objects.prefetch_related('subscriptions').filter(
@@ -110,6 +115,8 @@ class ListUserPostsView(generics.ListAPIView):
     """
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.PostSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = services.PostFilter
 
     def get_queryset(self):
         return Posts.objects.filter(author=self.request.user)
