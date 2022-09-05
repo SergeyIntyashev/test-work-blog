@@ -122,6 +122,20 @@ class ListUserPostsView(generics.ListAPIView):
         return Posts.objects.filter(author=self.request.user)
 
 
+class ListPostsOfBlogView(generics.ListAPIView):
+    """
+    Список постов блога
+    """
+
+    permission_classes = [AllowAny]
+    serializer_class = serializers.PostSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = services.PostFilter
+
+    def get_queryset(self):
+        return Posts.objects.filter(blog=self.kwargs[self.lookup_field])
+
+
 class PublishPostView(generics.CreateAPIView):
     """
     Публикация поста в блог
