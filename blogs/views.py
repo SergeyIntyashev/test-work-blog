@@ -47,24 +47,15 @@ class RetrieveBlogView(generics.RetrieveAPIView):
     permission_classes = [AllowAny]
 
 
-class UpdateBlogView(generics.UpdateAPIView):
+class UpdateDestroyBlogView(generics.RetrieveUpdateDestroyAPIView):
     """
-    Обновление блога
-    """
-
-    queryset = Blogs.objects.all()
-    serializer_class = serializers.BlogSerializer
-    permission_classes = [IsAuthenticatedAndOwner | IsAdminUser]
-
-
-class DestroyBlogView(generics.DestroyAPIView):
-    """
-    Удаление блога
+    Обновление, удаление блога
     """
 
     queryset = Blogs.objects.all()
     serializer_class = serializers.BlogSerializer
     permission_classes = [IsAuthenticatedAndOwner | IsAdminUser]
+    http_method_names = ('put', 'patch', 'delete')
 
 
 class AddAuthorsToBlogView(generics.UpdateAPIView):
@@ -148,9 +139,9 @@ class ListPostsOfBlogView(generics.ListAPIView):
         return Posts.objects.filter(blog=self.kwargs[self.lookup_field])
 
 
-class PublishPostView(generics.CreateAPIView):
+class CreatePostView(generics.CreateAPIView):
     """
-    Публикация поста в блог
+    Создание поста
     """
 
     permission_classes = [IsAuthenticated, IsAuthorOrBlogOwner | IsAdminUser]
@@ -171,6 +162,56 @@ class PublishPostView(generics.CreateAPIView):
         serializer.save()
 
 
+class RetrievePostView(generics.RetrieveAPIView):
+    """
+    Получение поста
+    """
+
+    queryset = Posts.objects.all()
+    serializer_class = serializers.PostSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return Posts.objects.select_related('blog').filter(
+            id=self.kwargs[self.lookup_field])
+
+    def get(self, request, *args, **kwargs):
+        """
+        Автоувеличение количества просмотров
+        Не разрешаем владельцу блога набивать просмотры
+        """
+
+        services.increase_views_of_post(post=self.get_object(),
+                                        user=self.request.user)
+        return super().get(request, *args, **kwargs)
+
+
+class UpdateDestroyPostView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Обновление, удаление поста
+    """
+
+    queryset = Posts.objects.all()
+    serializer_class = serializers.PostSerializer
+    permission_classes = [IsAuthenticatedAndOwner | IsAdminUser]
+    http_method_names = ('put', 'patch', 'delete')
+
+
+class LikePostView(APIView):
+    """
+    Увеличение лайка у поста
+    """
+
+    permission_classes = [IsAuthenticated | IsAdminUser]
+
+    def post(self, request, *args, **kwargs):
+        post = generics.get_object_or_404(Posts,
+                                          id=self.kwargs['pk'])
+        services.increase_likes_of_post(post)
+
+        return Response(status=status.HTTP_200_OK)
+
+
 class CreateCommentView(generics.CreateAPIView):
     """
     Создание комментария для поста
@@ -189,18 +230,3 @@ class CreateCommentView(generics.CreateAPIView):
         serializer.validated_data['post'] = post
 
         serializer.save()
-
-
-class LikePostView(APIView):
-    """
-    Увеличение лайка у поста
-    """
-
-    permission_classes = [IsAuthenticated | IsAdminUser]
-
-    def post(self, request, *args, **kwargs):
-        post = generics.get_object_or_404(Posts,
-                                          id=self.kwargs['pk'])
-        services.add_like_to_post(post)
-
-        return Response(status=status.HTTP_200_OK)
