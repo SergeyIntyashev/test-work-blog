@@ -26,7 +26,7 @@ class CreateBlogView(generics.CreateAPIView):
     Создание блога
     """
 
-    permission_classes = [IsAuthenticated | IsAdminUser]
+    permission_classes = [IsAuthenticated]
     serializer_class = serializers.BlogSerializer
 
     def perform_create(self, serializer):
@@ -82,13 +82,25 @@ class SubscribeToBlogView(generics.UpdateAPIView):
     """
     Подписка пользователя на блог
     """
-    permission_classes = [IsAuthenticated | IsAdminUser]
+    permission_classes = [IsAuthenticated]
     serializer_class = serializers.AddSubscriptionsToBlogSerializer
     http_method_names = ["patch"]
 
     def get_queryset(self):
         return Blogs.objects.prefetch_related('subscriptions').filter(
             id=self.kwargs[self.lookup_field])
+
+
+class FavoriteBlogsView(generics.ListAPIView):
+    """
+    Блоги на которые подписан пользователь
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.BlogSerializer
+
+    def get_queryset(self):
+        return Blogs.objects.prefetch_related('subscriptions').filter(
+            subscriptions__user=self.request.user.id)
 
 
 # POST VIEWS
