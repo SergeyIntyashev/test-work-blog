@@ -3,7 +3,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, generics, filters
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from blogs import serializers, services
@@ -59,10 +58,13 @@ class UpdateDestroyBlogView(generics.RetrieveUpdateDestroyAPIView):
     Обновление, удаление блога
     """
 
-    queryset = Blogs.objects.all()
     serializer_class = serializers.BlogSerializer
     permission_classes = [IsAuthenticatedAndOwner | IsAdminUser]
     http_method_names = ('put', 'patch', 'delete')
+
+    def get_queryset(self):
+        return Blogs.objects.prefetch_related('authors').filter(
+            owner=self.request.user.id)
 
 
 class AddAuthorsToBlogView(generics.UpdateAPIView):
@@ -76,20 +78,17 @@ class AddAuthorsToBlogView(generics.UpdateAPIView):
 
     def get_queryset(self):
         return Blogs.objects.prefetch_related('authors').filter(
-            id=self.kwargs[self.lookup_field])
+            owner=self.request.user.id)
 
 
 class SubscribeToBlogView(generics.UpdateAPIView):
     """
     Подписка пользователя на блог
     """
+    queryset = Blogs.objects.prefetch_related('subscriptions').all()
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.AddSubscriptionsToBlogSerializer
     http_method_names = ["patch"]
-
-    def get_queryset(self):
-        return Blogs.objects.prefetch_related('subscriptions').filter(
-            id=self.kwargs[self.lookup_field])
 
 
 class ListFavoriteBlogsView(generics.ListAPIView):
@@ -129,7 +128,7 @@ class ListUserPostsView(generics.ListAPIView):
     ordering_fields = ['title', 'created_at', 'likes']
 
     def get_queryset(self):
-        return Posts.objects.filter(author=self.request.user)
+        return Posts.objects.filter(author=self.request.user.id)
 
 
 class ListPostsView(generics.ListAPIView):
@@ -167,7 +166,12 @@ class ListPostsOfBlogView(generics.ListAPIView):
     ordering_fields = ['title', 'created_at', 'likes']
 
     def get_queryset(self):
-        return Posts.objects.filter(blog=self.kwargs[self.lookup_field])
+        queryset = Posts.objects.none()
+        if not getattr(self, 'swagger_fake_view', False):
+            # queryset just for schema generation metadata
+            queryset = Posts.objects.filter(blog=self.kwargs['pk'])
+
+        return queryset
 
 
 class CreatePostView(generics.CreateAPIView):
@@ -175,11 +179,9 @@ class CreatePostView(generics.CreateAPIView):
     Создание поста
     """
 
+    queryset = Blogs.objects.all()
     permission_classes = [IsAuthenticated, IsAuthorOrBlogOwner | IsAdminUser]
     serializer_class = serializers.PostSerializer
-
-    def get_queryset(self):
-        return Blogs.objects.filter(id=self.kwargs[self.lookup_field])
 
     def perform_create(self, serializer):
         blog = self.get_object()
@@ -198,13 +200,9 @@ class RetrievePostView(generics.RetrieveAPIView):
     Получение поста
     """
 
-    queryset = Posts.objects.all()
+    queryset = Posts.objects.select_related('blog').all()
     serializer_class = serializers.PostSerializer
     permission_classes = [AllowAny]
-
-    def get_queryset(self):
-        return Posts.objects.select_related('blog').filter(
-            id=self.kwargs[self.lookup_field])
 
     def get(self, request, *args, **kwargs):
         """
@@ -228,15 +226,16 @@ class UpdateDestroyPostView(generics.RetrieveUpdateDestroyAPIView):
     http_method_names = ('put', 'patch', 'delete')
 
 
-class LikePostView(APIView):
+class LikePostView(generics.GenericAPIView):
     """
     Увеличение лайка у поста
     """
 
+    queryset = Posts.objects.all()
     permission_classes = [IsAuthenticated | IsAdminUser]
 
-    def post(self, request, *args, **kwargs):
-        post = generics.get_object_or_404(Posts, id=self.kwargs['pk'])
+    def patch(self):
+        post = self.get_object()
         services.increase_likes_of_post(post)
 
         return Response(status=status.HTTP_200_OK)
@@ -247,11 +246,9 @@ class CreateCommentView(generics.CreateAPIView):
     Создание комментария для поста
     """
 
+    queryset = Posts.objects.all()
     permission_classes = [IsAuthenticated | IsAdminUser]
     serializer_class = serializers.CommentSerializer
-
-    def get_queryset(self):
-        return Posts.objects.filter(id=self.kwargs[self.lookup_field])
 
     def perform_create(self, serializer):
         post = self.get_object()
