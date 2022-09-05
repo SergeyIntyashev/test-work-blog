@@ -91,7 +91,7 @@ class SubscribeToBlogView(generics.UpdateAPIView):
             id=self.kwargs[self.lookup_field])
 
 
-class FavoriteBlogsView(generics.ListAPIView):
+class ListFavoriteBlogsView(generics.ListAPIView):
     """
     Блоги на которые подписан пользователь
     """
@@ -104,6 +104,16 @@ class FavoriteBlogsView(generics.ListAPIView):
 
 
 # POST VIEWS
+class ListUserPostsView(generics.ListAPIView):
+    """
+    Посты опубликованные пользователем
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.PostSerializer
+
+    def get_queryset(self):
+        return Posts.objects.filter(author=self.request.user)
+
 
 class PublishPostView(generics.CreateAPIView):
     """
