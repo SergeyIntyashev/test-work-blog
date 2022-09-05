@@ -21,9 +21,12 @@ class ListBlogView(generics.ListAPIView):
     queryset = Blogs.objects.all()
     serializer_class = serializers.BlogSerializer
     permission_classes = [AllowAny]
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (
+        DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter
+    )
     filter_fields = ['created_at']
     search_fields = ['@title', '@authors__username']
+    ordering_fields = ['title', 'created_at']
 
 
 class CreateBlogView(generics.CreateAPIView):
@@ -93,9 +96,12 @@ class ListFavoriteBlogsView(generics.ListAPIView):
     """
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.BlogSerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (
+        DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter
+    )
     filter_fields = ['created_at']
     search_fields = ['@title', '@authors__username']
+    ordering_fields = ['title', 'created_at']
 
     def get_queryset(self):
         return Blogs.objects.prefetch_related('subscriptions').filter(
@@ -109,9 +115,12 @@ class ListUserPostsView(generics.ListAPIView):
     """
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.PostSerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (
+        DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter
+    )
     filterset_class = services.PostFilter
     search_fields = ['@title', '@author__username']
+    ordering_fields = ['title', 'created_at', 'likes']
 
     def get_queryset(self):
         return Posts.objects.filter(author=self.request.user)
@@ -125,9 +134,12 @@ class ListPostsView(generics.ListAPIView):
     queryset = Posts.objects.filter(is_published=True)
     permission_classes = [AllowAny]
     serializer_class = serializers.PostSerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (
+        DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter
+    )
     filterset_class = services.PostFilter
     search_fields = ['@title', '@author__username']
+    ordering_fields = ['title', 'created_at', 'likes']
 
 
 class ListPostsOfBlogView(generics.ListAPIView):
@@ -137,9 +149,12 @@ class ListPostsOfBlogView(generics.ListAPIView):
 
     permission_classes = [AllowAny]
     serializer_class = serializers.PostSerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (
+        DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter
+    )
     filterset_class = services.PostFilter
     search_fields = ['@title', '@author__username']
+    ordering_fields = ['title', 'created_at', 'likes']
 
     def get_queryset(self):
         return Posts.objects.filter(blog=self.kwargs[self.lookup_field])
