@@ -122,6 +122,18 @@ class ListUserPostsView(generics.ListAPIView):
         return Posts.objects.filter(author=self.request.user)
 
 
+class ListPostsView(generics.ListAPIView):
+    """
+    Список постов со всех блогов
+    """
+
+    queryset = Posts.objects.filter(is_published=True)
+    permission_classes = [AllowAny]
+    serializer_class = serializers.PostSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = services.PostFilter
+
+
 class ListPostsOfBlogView(generics.ListAPIView):
     """
     Список постов блога
