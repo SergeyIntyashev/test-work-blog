@@ -20,6 +20,7 @@ urlpatterns = [
     path('posts/<int:pk>', views.ListPostsOfBlogView.as_view(),
          name='posts-of-blog'),
 
+    path('posts', views.ListPostsView.as_view(), name='list-of-posts'),
     path('me/post', views.ListUserPostsView.as_view(),
          name='my-posts'),
     path('post/add-comment/<int:pk>',
