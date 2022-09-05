@@ -17,6 +17,8 @@ urlpatterns = [
          name='subscribe-to-blog'),
     path('favorites', views.ListFavoriteBlogsView.as_view(),
          name='my-favorite-blogs'),
+    path('posts/<int:pk>', views.ListPostsOfBlogView.as_view(),
+         name='posts-of-blog'),
 
     path('me/post', views.ListUserPostsView.as_view(),
          name='my-posts'),
