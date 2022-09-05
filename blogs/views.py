@@ -8,7 +8,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from blogs import serializers, services
 from blogs.models import Blogs, Posts, Comments, Tags
-from config.permissions import IsAuthenticatedAndOwner, IsAdminUser, \
+from users.permissions import IsAuthenticatedAndOwner, IsAdminUser, \
     IsAuthorOrBlogOwner, IsAdminOrReadOnly
 
 
