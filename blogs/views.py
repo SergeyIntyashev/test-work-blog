@@ -248,3 +248,12 @@ class TagsView(ModelViewSet):
     queryset = Tags.objects.all()
     permission_classes = [IsAdminOrReadOnly]
     serializer_class = serializers.TagSerializer
+
+
+add_author_to_blog = AddAuthorsToBlogView.as_view()
+subscribe_to_blog = SubscribeToBlogView.as_view()
+favorites_blogs = ListFavoriteBlogsView.as_view()
+blog_posts = ListPostsOfBlogView.as_view()
+user_posts = ListUserPostsView.as_view()
+create_comment = CreateCommentView.as_view()
+like_post = LikePostView.as_view()
