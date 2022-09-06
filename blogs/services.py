@@ -1,13 +1,7 @@
-from collections import namedtuple
-from typing import Type
-
 from django.db.models import F
 from django_filters import rest_framework as filters
 
 from blogs.models import Posts
-
-Actions = namedtuple('Actions',
-                     ['list', 'create', 'retrieve', 'update', 'delete'])
 
 
 def increase_likes_of_post(post: Posts) -> None:
@@ -47,24 +41,3 @@ class PostFilter(filters.FilterSet):
     class Meta:
         model = Posts
         fields = ['tags', 'created_at']
-
-
-def get_views_actions_model(view) -> Actions:
-    return Actions(
-        list=view.as_view({
-            'get': 'list',
-        }),
-        create=view.as_view({
-            'post': 'create',
-        }),
-        retrieve=view.as_view({
-            'get': 'retrieve',
-        }),
-        update=view.as_view({
-            'put': 'update',
-            'patch': 'partial_update',
-        }),
-        delete=view.as_view({
-            'delete': 'destroy'
-        })
-    )
