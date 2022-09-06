@@ -96,11 +96,10 @@
 
     pip install -r requirements.txt
     
-##### 3) Миграции и сбор статических файлов
+##### 3) Миграции
 
     python manage.py makemigrations
     python manage.py migrate
-    python manage.py collectstatic
 
 ##### 4) Создание супер пользователя для доступа к Django Admin Panel
 
