@@ -23,6 +23,6 @@ urlpatterns = [
             name='schema-redoc'),
 
     path('admin/', admin.site.urls),
-    path('blogs/', include('blogs.urls')),
+    path('api/', include('blogs.urls')),
     path('auth/', include('users.urls')),
 ]
