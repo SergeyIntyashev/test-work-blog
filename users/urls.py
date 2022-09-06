@@ -7,6 +7,6 @@ from users import views
 urlpatterns = [
     path('sign-in', views.SignInView.as_view(), name='account-create'),
     path('login', token_obtain_pair, name='login'),
-    path('logout', token_blacklist, name='logout'),
+    path('token/blacklist', token_blacklist, name='logout'),
     path('token/refresh', token_refresh, name='token-refresh'),
 ]
