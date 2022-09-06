@@ -56,7 +56,7 @@
 - Для авторизации пользователя необходимо отправить (POST) запрос на 
 ``/auth/login`` c username и password, в ответ будет получены access и refresh
 токены.
-- Для выхода необходимо отправить (POST) на ``/auth/logout`` с refresh токеном.
+- Для помещения refresh токена в blacklist необходимо отправить (POST) на ``/auth/token/blacklist`` с refresh токеном.
 - Для отправки авторизованных запросов необходимо добавлять к запросу
 заголовок Authorization со значением "Bearer {access token}".
 
