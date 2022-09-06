@@ -5,7 +5,6 @@ from django.db.models import F
 from django_filters import rest_framework as filters
 
 from blogs.models import Posts
-from blogs.views import PostsView, BlogsView
 
 Actions = namedtuple('Actions',
                      ['list', 'create', 'retrieve', 'update', 'delete'])
@@ -50,7 +49,7 @@ class PostFilter(filters.FilterSet):
         fields = ['tags', 'created_at']
 
 
-def get_views_actions_model(view: Type[BlogsView | PostsView]) -> Actions:
+def get_views_actions_model(view) -> Actions:
     return Actions(
         list=view.as_view({
             'get': 'list',
