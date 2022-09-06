@@ -20,15 +20,17 @@ class BlogSerializer(serializers.ModelSerializer):
     Сериализатор для блогов
     """
 
-    owner = UserSerializer(read_only=True)
-    authors = UserSerializer(many=True, read_only=True)
-    subscriptions = UserSerializer(many=True, read_only=True)
-    created_at = serializers.DateTimeField(read_only=True)
-    updated_at = serializers.DateTimeField(read_only=True)
-
     class Meta:
         model = Blogs
         fields = '__all__'
+        read_only_fields = (
+            'id',
+            'owner',
+            'authors',
+            'subscriptions',
+            'created_at',
+            'updated_at'
+        )
 
 
 class AddAuthorsToBlogSerializer(serializers.ModelSerializer):
@@ -70,7 +72,7 @@ class AddSubscriptionsToBlogSerializer(serializers.ModelSerializer):
         fields = ['subscriptions']
 
 
-class TagSerializer(PrimaryKeyRelatedField, serializers.ModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
     """
     Сериализатор для тэгов
     """
@@ -85,26 +87,29 @@ class PostSerializer(serializers.ModelSerializer):
     Сериализатор для постов
     """
 
-    author = UserSerializer(read_only=True)
-    created_at = serializers.DateTimeField(read_only=True)
-    likes = serializers.IntegerField(read_only=True)
-    views = serializers.IntegerField(read_only=True)
-    blog = BlogSerializer(read_only=True)
-    tags = TagSerializer(many=True, queryset=Tags.objects.all())
-
     class Meta:
         model = Posts
         fields = '__all__'
+        read_only_fields = (
+            'id',
+            'author',
+            'likes',
+            'views',
+            'created_at',
+        )
 
 
 class CommentSerializer(serializers.ModelSerializer):
     """
     Сериализатор для комментариев
     """
-    author = UserSerializer(read_only=True)
-    created_at = serializers.DateTimeField(read_only=True)
-    post = PostSerializer(read_only=True)
 
     class Meta:
         model = Comments
         fields = '__all__'
+        read_only_fields = (
+            'id',
+            'author',
+            'post',
+            'created_at',
+        )
