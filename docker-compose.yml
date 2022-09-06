@@ -10,8 +10,9 @@ services:
     container_name: blog_app
     build: ./
     command: >
-      sh -c "python manage.py migrate &&
-             gunicorn --bind 0.0.0.0:8000 config.wsgi"
+      sh -c "python manage.py collectstatic &&
+             python manage.py migrate &&
+             gunicorn --bind 0.0.0.0:8000 config.wsgi -workers 4"
     volumes:
       - .:/usr/src/app/
     ports:
