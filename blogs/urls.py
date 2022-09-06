@@ -3,13 +3,34 @@ from rest_framework.routers import SimpleRouter
 
 from blogs import views
 
+blog_list = views.BlogsView.as_view({
+    'get': 'list',
+})
+
+blog_create = views.BlogsView.as_view({
+    'post': 'create',
+})
+
+blog_detail = views.BlogsView.as_view({
+    'get': 'retrieve',
+})
+
+blog_update = views.BlogsView.as_view({
+    'put': 'update',
+    'patch': 'partial_update',
+})
+
+blog_delete = views.BlogsView.as_view({
+    'delete': 'destroy'
+})
+
 urlpatterns = [
-    path('', views.ListBlogView.as_view(), name='list-of-blogs'),
-    path('<int:pk>', views.RetrieveBlogView.as_view(), name='blog-details'),
-    path('me/create', views.CreateBlogView.as_view(), name='create-blog'),
-    path('me/update/<int:pk>', views.UpdateDestroyBlogView.as_view(),
+    path('', blog_list, name='list-of-blogs'),
+    path('<int:pk>', blog_detail, name='blog-details'),
+    path('me/create', blog_create, name='create-blog'),
+    path('me/update/<int:pk>', blog_update,
          name='update-blog'),
-    path('me/<int:pk>', views.UpdateDestroyBlogView.as_view(),
+    path('me/<int:pk>', blog_delete,
          name='delete-blog'),
     path('me/add-authors/<int:pk>', views.AddAuthorsToBlogView.as_view(),
          name='add-authors-to-blog'),

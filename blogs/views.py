@@ -12,14 +12,14 @@ from users.permissions import IsAuthenticatedAndOwner, IsAdminUser, \
 
 
 # BLOG VIEWS
-class ListBlogView(generics.ListAPIView):
+
+class BlogsView(ModelViewSet):
     """
-    Список блогов
+    View для блогов
     """
 
     queryset = Blogs.objects.all()
     serializer_class = serializers.BlogSerializer
-    permission_classes = [AllowAny]
     filter_backends = (
         DjangoFilterBackend,
         filters.SearchFilter,
@@ -29,42 +29,19 @@ class ListBlogView(generics.ListAPIView):
     search_fields = ['@title', '@authors__username']
     ordering_fields = ['title', 'created_at']
 
+    def get_permissions(self):
+        if self.action in ('list', 'retrieve'):
+            permission_classes = [AllowAny]
+        elif self.action == 'create':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticatedAndOwner | IsAdminUser]
 
-class CreateBlogView(generics.CreateAPIView):
-    """
-    Создание блога
-    """
-
-    permission_classes = [IsAuthenticated]
-    serializer_class = serializers.BlogSerializer
+        return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
         serializer.validated_data['owner'] = self.request.user
         serializer.save()
-
-
-class RetrieveBlogView(generics.RetrieveAPIView):
-    """
-    Получение блога
-    """
-
-    queryset = Blogs.objects.all()
-    serializer_class = serializers.BlogSerializer
-    permission_classes = [AllowAny]
-
-
-class UpdateDestroyBlogView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    Обновление, удаление блога
-    """
-
-    serializer_class = serializers.BlogSerializer
-    permission_classes = [IsAuthenticatedAndOwner | IsAdminUser]
-    http_method_names = ('put', 'patch', 'delete')
-
-    def get_queryset(self):
-        return Blogs.objects.prefetch_related('authors').filter(
-            owner=self.request.user.id)
 
 
 class AddAuthorsToBlogView(generics.UpdateAPIView):
@@ -112,6 +89,7 @@ class ListFavoriteBlogsView(generics.ListAPIView):
 
 
 # POST VIEWS
+
 class ListUserPostsView(generics.ListAPIView):
     """
     Посты опубликованные пользователем
