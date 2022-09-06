@@ -109,24 +109,6 @@ class ListUserPostsView(generics.ListAPIView):
         return Posts.objects.filter(author=self.request.user.id)
 
 
-class ListPostsView(generics.ListAPIView):
-    """
-    Список постов со всех блогов
-    """
-
-    queryset = Posts.objects.filter(is_published=True)
-    permission_classes = [AllowAny]
-    serializer_class = serializers.PostSerializer
-    filter_backends = (
-        DjangoFilterBackend,
-        filters.SearchFilter,
-        filters.OrderingFilter
-    )
-    filterset_class = services.PostFilter
-    search_fields = ['@title', '@author__username']
-    ordering_fields = ['title', 'created_at', 'likes']
-
-
 class ListPostsOfBlogView(generics.ListAPIView):
     """
     Список постов блога
@@ -152,14 +134,42 @@ class ListPostsOfBlogView(generics.ListAPIView):
         return queryset
 
 
-class CreatePostView(generics.CreateAPIView):
+class PostsView(ModelViewSet):
     """
-    Создание поста
+    View для постов
     """
 
-    queryset = Blogs.objects.all()
-    permission_classes = [IsAuthenticated, IsAuthorOrBlogOwner | IsAdminUser]
     serializer_class = serializers.PostSerializer
+    filter_backends = (
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter
+    )
+    filterset_class = services.PostFilter
+    search_fields = ['@title', '@author__username']
+    ordering_fields = ['title', 'created_at', 'likes']
+
+    def get_permissions(self):
+        if self.action in ('list', 'retrieve'):
+            permission_classes = [AllowAny]
+        elif self.action == 'create':
+            permission_classes = [
+                IsAuthenticated,
+                IsAuthorOrBlogOwner | IsAdminUser
+            ]
+        else:
+            permission_classes = [IsAuthenticatedAndOwner | IsAdminUser]
+
+        return [permission() for permission in permission_classes]
+
+    def get_queryset(self):
+        queryset = Posts.objects.all()
+        if self.action == 'list':
+            queryset = Posts.objects.filter(is_published=True)
+        elif self.action == 'retrieve':
+            queryset = Posts.objects.select_related('blog').all()
+
+        return queryset
 
     def perform_create(self, serializer):
         blog = self.get_object()
@@ -172,17 +182,7 @@ class CreatePostView(generics.CreateAPIView):
 
         serializer.save()
 
-
-class RetrievePostView(generics.RetrieveAPIView):
-    """
-    Получение поста
-    """
-
-    queryset = Posts.objects.select_related('blog').all()
-    serializer_class = serializers.PostSerializer
-    permission_classes = [AllowAny]
-
-    def get(self, request, *args, **kwargs):
+    def retrieve(self, request, *args, **kwargs):
         """
         Автоувеличение количества просмотров
         Не разрешаем владельцу блога набивать просмотры
@@ -190,18 +190,7 @@ class RetrievePostView(generics.RetrieveAPIView):
 
         services.increase_views_of_post(post=self.get_object(),
                                         user=self.request.user)
-        return super().get(request, *args, **kwargs)
-
-
-class UpdateDestroyPostView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    Обновление, удаление поста
-    """
-
-    queryset = Posts.objects.all()
-    serializer_class = serializers.PostSerializer
-    permission_classes = [IsAuthenticatedAndOwner | IsAdminUser]
-    http_method_names = ('put', 'patch', 'delete')
+        return super().retrieve(request, *args, **kwargs)
 
 
 class LikePostView(generics.GenericAPIView):
