@@ -1,6 +1,7 @@
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, generics, filters
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -172,7 +173,8 @@ class PostsView(ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        blog = self.get_object()
+        blog = get_object_or_404(Blogs.objects.all(), id=self.kwargs['blog'])
+        self.check_object_permissions(self.request, blog)
 
         serializer.validated_data['blog'] = blog
         serializer.validated_data['author'] = self.request.user
