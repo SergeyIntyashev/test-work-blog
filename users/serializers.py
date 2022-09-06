@@ -11,12 +11,11 @@ class CreateCommonUserSerializer(serializers.ModelSerializer):
     """
     Сериализатор для создания пользователя
     """
-    password = serializers.CharField(style={'input_type': 'password'},
-                                     write_only=True)
 
     class Meta:
         model = CustomUser
         fields = ('id', 'username', 'password')
+        extra_kwargs = {'password': {'write_only': True}}
 
     def validate(self, attrs):
         """
