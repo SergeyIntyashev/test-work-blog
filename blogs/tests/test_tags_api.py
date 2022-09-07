@@ -167,7 +167,7 @@ class PrivateTagsAPITest(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(len(tags), 2)
 
-    def test_tag_update_not_owner(self):
+    def test_tag_update_not_admin(self):
         """
         Тестирование обновления тэга
         пользователем не являющимся админом
