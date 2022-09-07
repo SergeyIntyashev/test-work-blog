@@ -216,7 +216,7 @@ class CreateCommentView(generics.CreateAPIView):
 
     queryset = Posts.objects.all()
     permission_classes = [IsAuthenticated | IsAdminUser]
-    serializer_class = serializers.CommentSerializer
+    serializer_class = serializers.AddCommentSerializer
 
     def perform_create(self, serializer):
         post = self.get_object()
