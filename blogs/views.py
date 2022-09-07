@@ -236,6 +236,10 @@ class CommentView(ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filter_fields = ('post',)
 
+    def perform_create(self, serializer):
+        serializer.validated_data['author'] = self.request.user
+        serializer.save()
+
 
 class TagsView(ModelViewSet):
     """
