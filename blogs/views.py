@@ -84,7 +84,7 @@ class ListFavoriteBlogsView(generics.ListAPIView):
 
     def get_queryset(self):
         return Blogs.objects.prefetch_related('subscriptions').filter(
-            subscriptions__user=self.request.user.id)
+            subscriptions__id=self.request.user.id)
 
 
 class ListUserPostsView(generics.ListAPIView):
