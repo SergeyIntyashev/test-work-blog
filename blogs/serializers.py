@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.relations import PrimaryKeyRelatedField
 
 from blogs.models import Blogs, Posts, Comments, Tags
 
@@ -110,5 +109,21 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'id',
             'author',
+            'created_at',
+        )
+
+
+class AddCommentSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для добавления комментариев
+    """
+
+    class Meta:
+        model = Comments
+        fields = '__all__'
+        read_only_fields = (
+            'id',
+            'author',
+            'post',
             'created_at',
         )
