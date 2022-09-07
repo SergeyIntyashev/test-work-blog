@@ -12,8 +12,6 @@ from users.permissions import IsAuthenticatedAndOwner, IsAdminUser, \
     IsAuthorOrBlogOwner, IsAdminOrReadOnly
 
 
-# BLOG VIEWS
-
 class BlogsView(ModelViewSet):
     """
     View для блогов
@@ -88,8 +86,6 @@ class ListFavoriteBlogsView(generics.ListAPIView):
         return Blogs.objects.prefetch_related('subscriptions').filter(
             subscriptions__user=self.request.user.id)
 
-
-# POST VIEWS
 
 class ListUserPostsView(generics.ListAPIView):
     """
