@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from blogs.models import Blogs
+from blogs.models import Blogs, Posts
 from blogs.serializers import BlogSerializer
 
 
@@ -23,20 +23,51 @@ class PublicBlogAPITest(APITestCase):
             password='commonuserpassword1234!'
         )
 
-        create_blog(
+        blog1 = create_blog(
             title='Blog title 1',
             description='Blog description 1',
             owner=self.common_user
         )
 
-        create_blog(
+        blog2 = create_blog(
             title='Blog title 2',
             description='Blog description 2',
             owner=self.common_user
         )
 
+        Posts.objects.create(
+            author=self.common_user,
+            title='Post title 1',
+            body='Post body 1',
+            is_published=True,
+            blog=blog1
+        )
+
+        Posts.objects.create(
+            author=self.common_user,
+            title='Post title 2',
+            body='Post body 2',
+            is_published=True,
+            blog=blog1
+        )
+
+        Posts.objects.create(
+            author=self.common_user,
+            title='Post title 3',
+            body='Post body 3',
+            blog=blog1
+        )
+
+        Posts.objects.create(
+            author=self.common_user,
+            title='Post title 4',
+            body='Post body 4',
+            is_published=True,
+            blog=blog2
+        )
+
     def test_blog_list(self):
-        """Тестрование получения списка блогов"""
+        """Тестирование получения списка блогов"""
 
         res = self.client.get(self.blog_url)
 
@@ -46,6 +77,18 @@ class PublicBlogAPITest(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data['results']), 2)
         self.assertEqual(res.data['results'], serializer.data)
+
+    def test_blog_posts_list(self):
+        """Тестирование получения списка постов блога"""
+
+        url = f'{self.blog_url}1/posts'
+
+        res = self.client.get(url)
+
+        posts = Posts.objects.filter(is_published=True, blog_id=1).all()
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data['results']), len(posts))
 
     def test_blog_details(self):
         """Тестирование получения данных конкретного блога"""
