@@ -8,16 +8,6 @@ def create_user(**params):
     return get_user_model().objects.create_common_user(**params)
 
 
-common_payload = {
-    'username': 'testuser2',
-    'password': 'testpassword525529!'
-}
-
-created_user_payload = {
-    'username': 'testuser1',
-    'password': 'testpassword525529!'
-}
-
 account_create_url = reverse('account-create')
 login_url = reverse('login')
 blacklist_url = reverse('logout')
@@ -26,27 +16,40 @@ token_refresh_url = reverse('token-refresh')
 
 class UserTests(APITestCase):
 
-    def setUp(self) -> None:
-
-        create_user(**created_user_payload)
-
     def test_create_valid_user(self):
         """Тестирование успешного создания пользователя"""
 
+        payload = {
+            'username': 'testuser2',
+            'password': 'testpassword525529!'
+        }
+
         url = reverse('account-create')
-        response = self.client.post(url, common_payload)
+        response = self.client.post(url, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         user = get_user_model().objects.get(
-            username=common_payload['username'])
-        self.assertTrue(user.check_password(common_payload['password']))
+            username=payload['username'])
+        self.assertTrue(user.check_password(payload['password']))
         self.assertNotIn('password', response.data)
 
     def test_user_exists(self):
-        """Тестирование создания уже существующего пользователя"""
+        """Тестирование создания пользователя c существующим username"""
+
+        payload = {
+            'username': 'testuser1',
+            'password': 'testpassword525529!'
+        }
+
+        create_user(**payload)
+
+        payload2 = {
+            'username': 'testuser1',
+            'password': 'testpassword123876521!'
+        }
 
         url = reverse('account-create')
-        response = self.client.post(url, created_user_payload)
+        response = self.client.post(url, payload2)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -70,7 +73,14 @@ class UserTests(APITestCase):
     def test_create_token_for_user(self):
         """Тестирование авторизации пользователя"""
 
-        response = self.client.post(login_url, created_user_payload)
+        payload = {
+            'username': 'testuser1',
+            'password': 'testpassword525529!'
+        }
+
+        create_user(**payload)
+
+        response = self.client.post(login_url, payload)
         self.assertIn('access', response.data)
         self.assertIn('refresh', response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -104,7 +114,14 @@ class UserTests(APITestCase):
     def test_refresh_token(self):
         """Тестирование получения access токена при помощи refresh токена"""
 
-        response_login = self.client.post(login_url, created_user_payload)
+        payload = {
+            'username': 'testuser1',
+            'password': 'testpassword525529!'
+        }
+
+        create_user(**payload)
+
+        response_login = self.client.post(login_url, payload)
 
         payload = {'refresh': response_login.data['refresh']}
 
@@ -136,7 +153,14 @@ class UserTests(APITestCase):
     def test_blacklist_token(self):
         """Тестирование удачного помещения токена в blacklist"""
 
-        response_login = self.client.post(login_url, created_user_payload)
+        payload = {
+            'username': 'testuser1',
+            'password': 'testpassword525529!'
+        }
+
+        create_user(**payload)
+
+        response_login = self.client.post(login_url, payload)
 
         payload = {'refresh': response_login.data['refresh']}
 
