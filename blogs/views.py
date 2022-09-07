@@ -208,11 +208,12 @@ class PostsView(ModelViewSet):
 
 class LikePostView(generics.UpdateAPIView):
     """
-    Увеличение лайка у поста
+    Увеличение лайков поста
     """
 
     queryset = Posts.objects.all()
     permission_classes = [IsAuthenticated | IsAdminUser]
+    serializer_class = serializers.PostSerializer
 
     def patch(self, request, *args, **kwargs):
         post = self.get_object()
