@@ -126,7 +126,10 @@ class ListPostsOfBlogView(generics.ListAPIView):
         queryset = Posts.objects.none()
         if not getattr(self, 'swagger_fake_view', False):
             # queryset just for schema generation metadata
-            queryset = Posts.objects.filter(blog=self.kwargs['pk'])
+            queryset = Posts.objects.filter(
+                is_published=True,
+                blog=self.kwargs['pk']
+            )
 
         return queryset
 
