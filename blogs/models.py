@@ -35,7 +35,7 @@ class Blogs(models.Model):
         ]
 
     def __str__(self):
-        return f"id :{self.id} owner: {self.owner.username}"
+        return f"id: {self.id} owner: {self.owner.username}"
 
 
 class Tags(models.Model):
@@ -74,7 +74,7 @@ class Posts(models.Model):
         ]
 
     def __str__(self):
-        return f"id :{self.id} author: {self.author.username} " \
+        return f"id: {self.id} author: {self.author.username} " \
                f"blog: {self.blog.id}"
 
 
