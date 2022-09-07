@@ -243,6 +243,6 @@ class TagsView(ModelViewSet):
     CRUD для администратора
     Read-only для всех
     """
-    queryset = Tags.objects.all()
+    queryset = Tags.objects.order_by('title').all()
     permission_classes = [IsAdminOrReadOnly]
     serializer_class = serializers.TagSerializer
