@@ -352,7 +352,6 @@ class PrivateBlogsAPITest(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(len(blog.authors.all()), 0)
 
-
     def test_blog_subscribe(self):
         """Тестирование подписки на блог"""
 
