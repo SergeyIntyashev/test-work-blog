@@ -13,6 +13,7 @@ def create_blog(**kwargs) -> Blogs:
 
 
 class PublicBlogAPITest(APITestCase):
+    """Тестирование методов API для неавторизованных запросов"""
 
     def setUp(self) -> None:
         self.blog_url = reverse('Blogs-list')
@@ -70,6 +71,7 @@ class PublicBlogAPITest(APITestCase):
 
 
 class PrivateBlogsAPITest(APITestCase):
+    """Тестирование методов API для авторизованных запросов"""
 
     def setUp(self) -> None:
         self.blog_url = reverse('Blogs-list')

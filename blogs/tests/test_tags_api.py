@@ -13,7 +13,7 @@ def create_tag(**kwargs) -> Tags:
 
 
 class PublicTagsAPITest(APITestCase):
-
+    """Тестирование методов API для неавторизованных запросов"""
     def setUp(self) -> None:
         self.tags_url = reverse('Tags-list')
 
@@ -60,6 +60,7 @@ class PublicTagsAPITest(APITestCase):
 
 
 class PrivateTagsAPITest(APITestCase):
+    """Тестирование методов API для авторизованных запросов"""
 
     def setUp(self) -> None:
         self.tags_url = reverse('Tags-list')
