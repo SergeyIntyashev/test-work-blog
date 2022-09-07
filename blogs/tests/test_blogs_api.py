@@ -146,8 +146,6 @@ class PrivateBlogsAPITest(APITestCase):
         пользователем не являющимся автором
         """
 
-        # TODO CHECK OBJECT PERMISSIONS!
-
         url = f"{self.blog_url}2/"
 
         res = self.client.delete(url)
@@ -190,8 +188,6 @@ class PrivateBlogsAPITest(APITestCase):
         Тестирование неудачного обновления блога
         пользователем не являющимся автором
         """
-
-        # TODO CHECK OBJECT PERMISSIONS!
 
         url = f"{self.blog_url}2/"
 
@@ -252,8 +248,6 @@ class PrivateBlogsAPITest(APITestCase):
         Тестирование неудачного частичного обновления блога
         пользователем не являющимся автором
         """
-
-        # TODO CHECK OBJECT PERMISSIONS!
 
         url = f"{self.blog_url}2/"
 
