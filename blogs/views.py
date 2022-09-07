@@ -194,7 +194,7 @@ class PostsView(ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
 
-class LikePostView(generics.GenericAPIView):
+class LikePostView(generics.UpdateAPIView):
     """
     Увеличение лайка у поста
     """
@@ -202,7 +202,7 @@ class LikePostView(generics.GenericAPIView):
     queryset = Posts.objects.all()
     permission_classes = [IsAuthenticated | IsAdminUser]
 
-    def patch(self):
+    def patch(self, request, *args, **kwargs):
         post = self.get_object()
         services.increase_likes_of_post(post)
 
