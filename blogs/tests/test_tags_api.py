@@ -226,7 +226,7 @@ class PrivateTagsAPITest(APITestCase):
         self.assertEqual(len(tags), 2)
         self.assertNotEqual(payload['title'], tags.get(id=1).title)
 
-    def test_tag_partial_update_not_owner(self):
+    def test_tag_partial_update_not_admin(self):
         """
         Тестирование частичного обновления тэга
         пользователем не являющимся админом
